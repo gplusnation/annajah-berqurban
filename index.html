@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Katalog Qurban</title>
+<title>Katalog Qurban An-Najah</title>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
 <style>
@@ -194,6 +194,24 @@
       font-size: 1.5em;
     }
   }
+  
+  .teks-responsif {
+            /* 1. Mengatur teks di tengah */
+            text-align: center;
+            
+            /* 2. Mengatur font miring */
+            font-style: italic;
+            
+            /* 3. Ukuran Font 14px responsif menggunakan clamp()
+               Minimum 12px, Ideal 14px, Maksimum 16px */
+            font-size: clamp(14px, 16px, 18px);
+            
+            /* 4. Agar teks menyesuaikan lebar layar */
+            width: 90%;
+            margin: 0 auto;
+            padding: 10px;
+            font-family: sans-serif;
+        }
 </style>
 </head>
 <body>
@@ -201,7 +219,9 @@
 <header>
   <h1>An-Najah Ber-Qurban 2026</h1>
 </header>
-
+<p class="teks-responsif">
+        Harga sudah termasuk biaya jagal dan operasional.
+    </p>
 <!-- Loader Spinner -->
 <div id="loader"></div>
 
@@ -214,13 +234,16 @@
 <div class="catalog" id="catalog">
   <!-- Produk akan dimuat di sini -->
 </div>
+<p class="teks-responsif">
+        Harga sudah termasuk biaya jagal dan operasional.
+    </p>
 
 <!-- Footer -->
 <footer>
   <p>&copy; 2026 Katalog Qurban An-Najah. All rights reserved.</p>
 </footer>
 
-<a href="https://wa.me/6285261400390" target="_blank" class="whatsapp-btn">
+<a href="https://wa.me/6282294653189" target="_blank" class="whatsapp-btn">
   <span class="whatsapp-icon">💬</span> Hubungi Panitia
 </a>
 

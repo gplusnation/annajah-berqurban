@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Katalog Qurban</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
 <style>
   * {
     box-sizing: border-box;
@@ -15,20 +17,54 @@
     background-color: #f4f4f8;
     color: #333;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
   }
+  /* Header dengan gambar background */
   header {
+    background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.0&auto=format&fit=crop&w=1600&q=80');
+    background-size: cover;
+    background-position: center;
+    padding: 40px 20px;
     text-align: center;
+    border-radius: 10px;
     margin-bottom: 20px;
   }
   header h1 {
     font-size: 2em;
-    color: #2d6a4f;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
   }
+
+  /* Loader Styles */
+  #loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 6px solid #ccc;
+    border-top: 6px solid #2d6a4f;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    z-index: 9999;
+  }
+  @keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  /* Kontainer produk */
   .catalog {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 15px;
+    flex: 1;
   }
+
+  /* Produk Card */
   .product {
     background: #fff;
     border-radius: 10px;
@@ -38,15 +74,48 @@
     flex-direction: column;
     transition: transform 0.2s, box-shadow 0.2s;
   }
+
   .product:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0,0,0,0.2);
   }
+
   .product img {
     width: 100%;
     height: 180px;
     object-fit: cover;
+    cursor: pointer;
   }
+
+  /* Gaya zoom overlay gambar */
+  #imgModal {
+    display: none; 
+    position: fixed; 
+    z-index: 9998; 
+    padding-top: 60px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.8);
+  }
+  #imgModal img {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 80%;
+  }
+  #imgModal span {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
   .product-details {
     padding: 10px;
     flex: 1;
@@ -69,6 +138,17 @@
     justify-content: space-between;
     margin-top: 8px;
   }
+  /* Warna status */
+  .status {
+    font-weight: bold;
+  }
+  .status.tersedia {
+    color: green;
+  }
+  .status.tidak-tersedia {
+    color: red;
+  }
+
   /* Tombol WhatsApp */
   .whatsapp-btn {
     position: fixed;
@@ -93,6 +173,22 @@
     margin-right: 8px;
     font-size: 1.2em;
   }
+
+  /* Footer */
+  footer {
+    margin-top: 20px;
+    padding: 15px 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    margin-top: auto;
+  }
+  footer p {
+    font-size: 0.9em;
+    color: #555;
+  }
+
   @media(max-width: 600px){
     header h1 {
       font-size: 1.5em;
@@ -103,21 +199,49 @@
 <body>
 
 <header>
-  <h1>Katalog Qurban</h1>
+  <h1>An-Najah Ber-Qurban 2026</h1>
 </header>
+
+<!-- Loader Spinner -->
+<div id="loader"></div>
+
+<!-- Gambar modal zoom -->
+<div id="imgModal">
+  <span id="closeModal">&times;</span>
+  <img id="modalImg" src="" alt="Zoom Gambar" />
+</div>
 
 <div class="catalog" id="catalog">
   <!-- Produk akan dimuat di sini -->
 </div>
 
+<!-- Footer -->
+<footer>
+  <p>&copy; 2026 Katalog Qurban An-Najah. All rights reserved.</p>
+</footer>
+
 <a href="https://wa.me/6285261400390" target="_blank" class="whatsapp-btn">
-  <span class="whatsapp-icon">💬</span> Pesan via WhatsApp
+  <span class="whatsapp-icon">💬</span> Hubungi Panitia
 </a>
 
 <script>
 const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfIEymb0n-Dokf-8l6yAnhoVIPyJDwxJ70wA6gl2K6HVwsue3sTeN1QFukfl-9t09qZj8DpcpZLE8-/pub?gid=0&single=true&output=csv";
 
+// Fungsi untuk tampilkan spinner
+function showLoader() {
+  document.getElementById('loader').style.display = 'block';
+}
+function hideLoader() {
+  document.getElementById('loader').style.display = 'none';
+}
+
+// Fungsi format angka dengan pemisah ribuan
+function formatRibuan(angka) {
+  return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
 async function loadCatalog() {
+  showLoader();
   try {
     const response = await fetch(csvUrl);
     const csvText = await response.text();
@@ -125,6 +249,8 @@ async function loadCatalog() {
     displayProducts(data);
   } catch (error) {
     console.error("Gagal memuat data:", error);
+  } finally {
+    hideLoader();
   }
 }
 
@@ -152,26 +278,57 @@ function displayProducts(products) {
 
     const imgSrc = product['gambar'] || "https://via.placeholder.com/300x180?text=Gambar";
     const name = product['nama'] || "Produk";
-    const harga = product['harga'] || "0";
+    const hargaStr = product['harga'] || "0";
     const bobot = product['bobot'] || "-";
-    const status = product['status'] || "-";
+    const statusText = product['status'] || "-";
+
+    // Format harga dengan pemisah ribuan
+    const hargaNumber = parseInt(hargaStr.replace(/\D/g,'')) || 0;
+    const hargaFormatted = formatRibuan(hargaNumber);
+
+    // Warna status
+    const statusClass = statusText.toLowerCase() === 'tersedia' ? 'tersedia' : 'tidak-tersedia';
 
     card.innerHTML = `
-      <img src="${imgSrc}" alt="${name}">
+      <img src="${imgSrc}" alt="${name}" class="zoom-image" />
       <div class="product-details">
         <h3>${name}</h3>
         <div class="info">
-          <div>Harga: Rp ${harga}</div>
-          <div>Bobot: ${bobot}</div>
+          <div>Rp. ${hargaFormatted}</div>
+          <div>± ${bobot} Kg</div>
         </div>
-        <p>Status: ${status}</p>
+        <p><span class="status ${statusClass}">${statusText}</span></p>
       </div>
     `;
+    // Tambahkan event klik gambar untuk zoom
+    card.querySelector('.zoom-image').onclick = () => {
+      openImageModal(imgSrc);
+    };
     container.appendChild(card);
   });
 }
 
-window.onload = loadCatalog;
+// Fungsi zoom gambar
+const modal = document.getElementById("imgModal");
+const modalImg = document.getElementById("modalImg");
+const closeModal = document.getElementById("closeModal");
+
+function openImageModal(src) {
+  modal.style.display = "block";
+  modalImg.src = src;
+}
+closeModal.onclick = () => {
+  modal.style.display = "none";
+};
+window.onclick = (event) => {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+};
+
+window.onload = () => {
+  loadCatalog();
+};
 </script>
 
 </body>

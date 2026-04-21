@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Katalog Qurban</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f4f8;
+    color: #333;
+    padding: 20px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  header h1 {
+    font-size: 2em;
+    color: #2d6a4f;
+  }
+  .catalog {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+  }
+  .product {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .product:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  .product img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+  .product-details {
+    padding: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .product h3 {
+    font-size: 1.1em;
+    margin-bottom: 8px;
+    color: #264653;
+  }
+  .product p {
+    font-size: 0.95em;
+    margin-bottom: 8px;
+  }
+  .info {
+    font-size: 0.9em;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+  /* Tombol WhatsApp */
+  .whatsapp-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #25D366;
+    color: #fff;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s;
+  }
+  .whatsapp-btn:hover {
+    background-color: #1ebe57;
+  }
+  .whatsapp-icon {
+    margin-right: 8px;
+    font-size: 1.2em;
+  }
+  @media(max-width: 600px){
+    header h1 {
+      font-size: 1.5em;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Katalog Qurban</h1>
+</header>
+
+<div class="catalog" id="catalog">
+  <!-- Produk akan dimuat di sini -->
+</div>
+
+<a href="https://wa.me/6285261400390" target="_blank" class="whatsapp-btn">
+  <span class="whatsapp-icon">💬</span> Pesan via WhatsApp
+</a>
+
+<script>
+const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfIEymb0n-Dokf-8l6yAnhoVIPyJDwxJ70wA6gl2K6HVwsue3sTeN1QFukfl-9t09qZj8DpcpZLE8-/pub?gid=0&single=true&output=csv";
+
+async function loadCatalog() {
+  try {
+    const response = await fetch(csvUrl);
+    const csvText = await response.text();
+    const data = parseCSV(csvText);
+    displayProducts(data);
+  } catch (error) {
+    console.error("Gagal memuat data:", error);
+  }
+}
+
+function parseCSV(csv) {
+  const lines = csv.trim().split("\n");
+  const headers = lines[0].split(",");
+  const items = [];
+  for (let i=1; i<lines.length; i++) {
+    const row = lines[i].split(",");
+    const item = {};
+    headers.forEach((header, index) => {
+      item[header.trim().toLowerCase()] = row[index] ? row[index].trim() : "";
+    });
+    items.push(item);
+  }
+  return items;
+}
+
+function displayProducts(products) {
+  const container = document.getElementById("catalog");
+  container.innerHTML = "";
+  products.forEach(product => {
+    const card = document.createElement("div");
+    card.className = "product";
+
+    const imgSrc = product['gambar'] || "https://via.placeholder.com/300x180?text=Gambar";
+    const name = product['nama'] || "Produk";
+    const harga = product['harga'] || "0";
+    const bobot = product['bobot'] || "-";
+    const status = product['status'] || "-";
+
+    card.innerHTML = `
+      <img src="${imgSrc}" alt="${name}">
+      <div class="product-details">
+        <h3>${name}</h3>
+        <div class="info">
+          <div>Harga: Rp ${harga}</div>
+          <div>Bobot: ${bobot}</div>
+        </div>
+        <p>Status: ${status}</p>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+window.onload = loadCatalog;
+</script>
+
+</body>
+</html>
